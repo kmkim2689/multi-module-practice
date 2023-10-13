@@ -1,10 +1,55 @@
 # How to Manage Different Dependencies in a Multi-Module Project
 
-## 1. What is a Multi-Module Architecture in Android Project?
+## 1. Gradle
+
+### 1.1. What is Gradle?
+
+> Gradle은 빌드 자동화 도구이다.
+
+* 초기 프로젝트에는
+    * 두 가지 build.gradle 파일이 존재
+    * settings.gradle
+    * local.properties
+    * 등등
+
+#### Gradle이란?
+* 빌드 자동화 도구로서
+  * gradle 파일에서 정의하였던 프로젝트의 설정을 활용하여 올바른 순서/방식대로 다양한 작업을 수행함으로써 하나의 실행 가능한 앱으로 만들어줌
+* Gradle이 프로젝트를 컴파일한다는 것은 사실이 아니다. 
+
+#### 안드로이드 Gradle의 두 가지 버전(타입)
+1. Gradle Groovy
+
+2. Gradle Kotlin DSL
+* Groovy 버전보다 자료형을 엄격히 요구하는 등 제약 존재
+* Groovy에 비해 더 많은 기능들을 제공(특히 자동 완성)
+
+#### build.gradle(Project Level)
+* Configurations about the 'project'
+* 프로젝트의 모든 모듈에 적용되는 빌드 구성을 정의
+  * plugins
+
+#### build.gradle(App Level)
+* android  { /* ... */ }
+  * android 블록에서는 애플리케이션에 설정할 안드로이드 관련 상세 구성을 정의
+    * compile sdk : 개발하고 있는 앱이 컴파일할 sdk 버전
+    * defaultConfig
+      * applicationId : 패키지명
+      * minSdk, targetSdk 등
+
+#### gradle-wrapper.properties
+* gradle wrapper?
+  * Project 모드로 패키지 구조를 살펴보면, gradlew라는 파일이 존재
+    * gradlew : binary file / 'w' stands for 'wrapper'
+    * script의 일종으로, gradle과 관련된 task들을 수행할 수 있도록 하는 코드로 이뤄져 있음
+
+-- -- --
+
+## 2. What is a Multi-Module Architecture in Android Project?
 
 * 참고 : [Android Developers - Guide to Android app modularization](https://developer.android.com/topic/modularization?hl=ko)
 
-### 1.1. 다중 모듈 프로젝트(Multi-Module Project)
+### 2.1. 다중 모듈 프로젝트(Multi-Module Project)
 
 > 여러 Gradle 모듈이 있는 프로젝트
 
@@ -45,7 +90,7 @@
       * 따라서 여러 모듈을 둔다면, 하나의 모듈에 모든 것을 포함시켰을 때보다 빌드 시간은 획기적으로 줄어들게 된다.
       * 또한, 특정 모듈에서만 활용되는 의존성에 대한 변경이 이뤄진다면, 해당 gradle 파일만 sync 작업을 진행해주면 되기 때문에 시간 절약 효과가 높다.
 
-### 1.2. 다중 모듈 아키텍처 도입 시 고려사항
+### 2.2. 다중 모듈 아키텍처 도입 시 고려사항
 
 #### 1. 처음부터 성급하게 다중모듈화를 하려고 하지 말 것
 
@@ -120,9 +165,9 @@ feat3 // all the layers related to feat3
 
 -- -- --
 
-## 2. Common Modularization Patterns
+## 3. Common Modularization Patterns
 
-### 2.1. Basic Principles
+### 3.1. Basic Principles
 
 #### 높은 응집도
 * 응집도 : "단일" 모듈의 요소들이 기능적으로 관련된 정도가 높아야 한다.
@@ -135,14 +180,14 @@ feat3 // all the layers related to feat3
   * 한 모듈의 변경 사항이 다른 모듈에 미치는 영향을 최소화해야 한다.
   * 모듈은 다른 모듈에 대해 알지 못하도록 모듈을 설계해야 한다.
 
-### 2.2. Modules
+### 3.2. Modules
 
 
 -- -- --
 
-## 3. Dependency Management by Modules
+## 4. Dependency Management by Modules
 
-### 3.1. Gradle 모듈을 만드는 방법
+### 4.1. Gradle 모듈을 만드는 방법
 
 > 주의사항 : gradle에 groovy가 아닌 kotlin을 활용하여야 한다.
 
@@ -156,7 +201,7 @@ feat3 // all the layers related to feat3
   * 각 모듈의 gradle 파일을 확인해보면, app level의 그것과 크게 다르지 않은 구조를 가지고 있음
 
     
-### 3.2. buildSrc 모듈로 전역적으로 사용되는 Dependency 관리하기
+### 4.2. buildSrc 모듈로 전역적으로 사용되는 Dependency 관리하기
 
 #### 문제점 : 각 모듈의 build.gradle 파일에 사용되어야 할 dependency들이 산발적으로 존재
 * 프로젝트의 규모가 커질수록, 모듈의 개수 역시 늘어나게 될 것이고 각 모듈마다 dependency를 관리한다는 것은 쉬운 것이 아닐 것이다.
@@ -336,8 +381,9 @@ feat3 // all the layers related to feat3
   2. Dependencies.kt 파일에서, 다음과 같이 추가
   * project() 함수를 통해, 특정 모듈명을 명시 - 스트링 형태
   * to introduce a module in another module, ":" 활용
+  * books-datasource
   ```
-  fun DependencyHandler.모듈명(booksDataSource) {
+  fun DependencyHandler.booksDataSource() {
       implementation(project(:books-datasource)) // :과 프로젝트에 설정했던 모듈명 활용
   }
   ```
